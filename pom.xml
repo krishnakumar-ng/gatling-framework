@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.gatling.automation</groupId>
+    <artifactId>gatling_automation_framework</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+    <name>Java-Gatling-Automation</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <gatling.version>3.11.5</gatling.version>
+        <apache-poi>5.2.5</apache-poi>
+        <apache.common.version>3.15.0</apache.common.version>
+        <assertj-core>3.25.2</assertj-core>
+        <lombok.version>1.18.30</lombok.version>
+        <owner.version>1.0.12</owner.version>
+        <guava.version>33.3.0-jre</guava.version>
+        <slf4j.version>2.23.1</slf4j.version>
+        <simulation.folder>src/test/java</simulation.folder>
+        <simulation.package>simulations</simulation.package>
+        <simulation.component/>
+        <simulation.class.name/>
+
+        <!--        Other Properties        -->
+        <results.dir>${project.basedir}/results/${result.time}</results.dir>
+
+        <!--        Plugin Properties       -->
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <maven.gatling.plugin.version>4.9.6</maven.gatling.plugin.version>
+        <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
+        <maven.builder.helper.plugin.version>3.5.0</maven.builder.helper.plugin.version>
+        <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+        <git.commit.id.plugin.version>4.9.10</git.commit.id.plugin.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner</artifactId>
+            <version>${owner.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <version>${maven.gatling.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <runMultipleSimulations>true</runMultipleSimulations>
+                    <simulationClass>${simulation.package}.${simulation.component}.${simulation.class.name}
+                    </simulationClass>
+                    <jvmArgs>
+                        <jvmArg>-Dtest.env=${test.env}</jvmArg>
+                    </jvmArgs>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <encoding>${project.build.outputEncoding}</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <test.env>${test.env}</test.env>
+                        <com.sun.security.enableAIAcaIssuers>true</com.sun.security.enableAIAcaIssuers>
+                        <jenkins.retry.logic.enabled>false</jenkins.retry.logic.enabled>
+                        <log4j2.formatMsgNoLookups>true</log4j2.formatMsgNoLookups>
+                    </systemPropertyVariables>
+                    <properties>
+                        <property>
+                            <!--The default thread count of the data provider in parallel mode is 10.
+                                To change this, the dataproviderthreadcount property needs to be added
+                                to the configuration section of the Surefire Failsafe plugin in the POM.-->
+                            <name>dataproviderthreadcount</name>
+                            <value>${threadCount}</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven.clean.plugin.version}</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>${git.commit.id.plugin.version}</version>
+                <configuration>
+                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>get-the-git-info</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+    </repositories>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <test.env>dev</test.env>
+                <threadCount>1</threadCount>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>qa</id>
+            <properties>
+                <test.env>qa</test.env>
+                <threadCount>1</threadCount>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>stage</id>
+            <properties>
+                <test.env>stage</test.env>
+                <threadCount>1</threadCount>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <test.env>prod</test.env>
+                <threadCount>1</threadCount>
+            </properties>
+        </profile>
+    </profiles>
+</project>
